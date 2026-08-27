@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# API keys / local configuration
+*.xcconfig.local
+Secrets.plist
+Secrets.swift

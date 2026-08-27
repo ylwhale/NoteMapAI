@@ -1,0 +1,968 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5A1000012F6A000100000001 /* MindMapShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 5A1000212F6A000100000001 /* MindMapShareExtension.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5A1000022F6A000100000001 /* MindMapWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 5A1000222F6A000100000001 /* MindMapWidgetExtension.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4A4CE86F2F44F56C009C314A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4A4CE8592F44F56C009C314A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4A4CE8602F44F56C009C314A;
+			remoteInfo = MindMapAI;
+		};
+		4A4CE8792F44F56C009C314A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4A4CE8592F44F56C009C314A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4A4CE8602F44F56C009C314A;
+			remoteInfo = MindMapAI;
+		};
+		5A1000112F6A000100000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4A4CE8592F44F56C009C314A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A1000512F6A000100000001;
+			remoteInfo = MindMapShareExtension;
+		};
+		5A1000122F6A000100000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4A4CE8592F44F56C009C314A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A1000522F6A000100000001;
+			remoteInfo = MindMapWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		5A1000812F6A000100000001 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				5A1000012F6A000100000001 /* MindMapShareExtension.appex in Embed App Extensions */,
+				5A1000022F6A000100000001 /* MindMapWidgetExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		4A4CE8612F44F56C009C314A /* MindMapAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MindMapAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4A4CE86E2F44F56C009C314A /* MindMapAITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MindMapAITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4A4CE8782F44F56C009C314A /* MindMapAIUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MindMapAIUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A1000212F6A000100000001 /* MindMapShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MindMapShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A1000222F6A000100000001 /* MindMapWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MindMapWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		4A4CE9022F44F56C009C314A /* Exceptions for "MindMapAI" folder in "MindMapAI" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				App/AlamofireStationLogo.swift,
+				App/Audio.swift,
+				App/Models.swift,
+				App/Onboarding.swift,
+				App/SettingsManager.swift,
+				App/Views/MapSupportViews.swift,
+				App/Views/MapTabView.swift,
+				App/Views/MediaPlayerViews.swift,
+				App/Views/PlaceDetailViews.swift,
+				App/Views/PlacesHomeViews.swift,
+				App/Views/PlacesListViews.swift,
+				App/Views/RecentTabView.swift,
+				App/Views/RootContainerViews.swift,
+				Assets.xcassets,
+				Resources/always_on_the_way.mp3,
+				Resources/AppLogo.png,
+				Resources/blue_state.mp3,
+				Resources/fail_sound.mp3,
+				Resources/food_loop.wav,
+				Resources/housing_loop.wav,
+				Resources/lighthouse.mp3,
+				Resources/meditation_music.mp3,
+				Resources/outdoors_loop.wav,
+				Resources/path_untrodden.mp3,
+				Resources/places.json,
+				Resources/september.mp3,
+				Resources/services_loop.wav,
+				Resources/sky_farm.mp3,
+				Resources/sound_medicine.mp3,
+				Resources/stations.json,
+				Resources/study_loop.wav,
+				Settings.bundle,
+			);
+			target = 4A4CE8602F44F56C009C314A /* MindMapAI */;
+		};
+		5A1000D12F6A000100000001 /* Exceptions for "MindMapShareExtension" folder in "MindMapShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 5A1000512F6A000100000001 /* MindMapShareExtension */;
+		};
+		5A1000D22F6A000100000001 /* Exceptions for "MindMapWidgetExtension" folder in "MindMapWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 5A1000522F6A000100000001 /* MindMapWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		4A4CE8632F44F56C009C314A /* MindMapAI */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4A4CE9022F44F56C009C314A /* Exceptions for "MindMapAI" folder in "MindMapAI" target */,
+			);
+			path = MindMapAI;
+			sourceTree = "<group>";
+		};
+		4A4CE8712F44F56C009C314A /* MindMapAITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MindMapAITests;
+			sourceTree = "<group>";
+		};
+		4A4CE87B2F44F56C009C314A /* MindMapAIUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MindMapAIUITests;
+			sourceTree = "<group>";
+		};
+		5A1000312F6A000100000001 /* MindMapShareExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5A1000D12F6A000100000001 /* Exceptions for "MindMapShareExtension" folder in "MindMapShareExtension" target */,
+			);
+			path = MindMapShareExtension;
+			sourceTree = "<group>";
+		};
+		5A1000322F6A000100000001 /* MindMapWidgetExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5A1000D22F6A000100000001 /* Exceptions for "MindMapWidgetExtension" folder in "MindMapWidgetExtension" target */,
+			);
+			path = MindMapWidgetExtension;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4A4CE85E2F44F56C009C314A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A4CE86B2F44F56C009C314A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A4CE8752F44F56C009C314A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A1000412F6A000100000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A1000422F6A000100000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4A4CE8582F44F56C009C314A = {
+			isa = PBXGroup;
+			children = (
+				4A4CE8632F44F56C009C314A /* MindMapAI */,
+				4A4CE8712F44F56C009C314A /* MindMapAITests */,
+				4A4CE87B2F44F56C009C314A /* MindMapAIUITests */,
+				5A1000312F6A000100000001 /* MindMapShareExtension */,
+				5A1000322F6A000100000001 /* MindMapWidgetExtension */,
+				4A4CE8622F44F56C009C314A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4A4CE8622F44F56C009C314A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4A4CE8612F44F56C009C314A /* MindMapAI.app */,
+				4A4CE86E2F44F56C009C314A /* MindMapAITests.xctest */,
+				4A4CE8782F44F56C009C314A /* MindMapAIUITests.xctest */,
+				5A1000212F6A000100000001 /* MindMapShareExtension.appex */,
+				5A1000222F6A000100000001 /* MindMapWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4A4CE8602F44F56C009C314A /* MindMapAI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4A4CE8822F44F56C009C314A /* Build configuration list for PBXNativeTarget "MindMapAI" */;
+			buildPhases = (
+				4A4CE85D2F44F56C009C314A /* Sources */,
+				4A4CE85E2F44F56C009C314A /* Frameworks */,
+				4A4CE85F2F44F56C009C314A /* Resources */,
+				5A1000812F6A000100000001 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5A1000912F6A000100000001 /* PBXTargetDependency */,
+				5A1000922F6A000100000001 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4A4CE8632F44F56C009C314A /* MindMapAI */,
+			);
+			name = MindMapAI;
+			packageProductDependencies = (
+			);
+			productName = MindMapAI;
+			productReference = 4A4CE8612F44F56C009C314A /* MindMapAI.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4A4CE86D2F44F56C009C314A /* MindMapAITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4A4CE8852F44F56C009C314A /* Build configuration list for PBXNativeTarget "MindMapAITests" */;
+			buildPhases = (
+				4A4CE86A2F44F56C009C314A /* Sources */,
+				4A4CE86B2F44F56C009C314A /* Frameworks */,
+				4A4CE86C2F44F56C009C314A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4A4CE8702F44F56C009C314A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4A4CE8712F44F56C009C314A /* MindMapAITests */,
+			);
+			name = MindMapAITests;
+			packageProductDependencies = (
+			);
+			productName = MindMapAITests;
+			productReference = 4A4CE86E2F44F56C009C314A /* MindMapAITests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		4A4CE8772F44F56C009C314A /* MindMapAIUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4A4CE8882F44F56C009C314A /* Build configuration list for PBXNativeTarget "MindMapAIUITests" */;
+			buildPhases = (
+				4A4CE8742F44F56C009C314A /* Sources */,
+				4A4CE8752F44F56C009C314A /* Frameworks */,
+				4A4CE8762F44F56C009C314A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4A4CE87A2F44F56C009C314A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4A4CE87B2F44F56C009C314A /* MindMapAIUITests */,
+			);
+			name = MindMapAIUITests;
+			packageProductDependencies = (
+			);
+			productName = MindMapAIUITests;
+			productReference = 4A4CE8782F44F56C009C314A /* MindMapAIUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		5A1000512F6A000100000001 /* MindMapShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A1000C12F6A000100000001 /* Build configuration list for PBXNativeTarget "MindMapShareExtension" */;
+			buildPhases = (
+				5A1000712F6A000100000001 /* Sources */,
+				5A1000412F6A000100000001 /* Frameworks */,
+				5A1000612F6A000100000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5A1000312F6A000100000001 /* MindMapShareExtension */,
+			);
+			name = MindMapShareExtension;
+			packageProductDependencies = (
+			);
+			productName = MindMapShareExtension;
+			productReference = 5A1000212F6A000100000001 /* MindMapShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		5A1000522F6A000100000001 /* MindMapWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A1000C22F6A000100000001 /* Build configuration list for PBXNativeTarget "MindMapWidgetExtension" */;
+			buildPhases = (
+				5A1000722F6A000100000001 /* Sources */,
+				5A1000422F6A000100000001 /* Frameworks */,
+				5A1000622F6A000100000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5A1000322F6A000100000001 /* MindMapWidgetExtension */,
+			);
+			name = MindMapWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = MindMapWidgetExtension;
+			productReference = 5A1000222F6A000100000001 /* MindMapWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4A4CE8592F44F56C009C314A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					4A4CE8602F44F56C009C314A = {
+						CreatedOnToolsVersion = 26.0.1;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
+					};
+					4A4CE86D2F44F56C009C314A = {
+						CreatedOnToolsVersion = 26.0.1;
+						TestTargetID = 4A4CE8602F44F56C009C314A;
+					};
+					4A4CE8772F44F56C009C314A = {
+						CreatedOnToolsVersion = 26.0.1;
+						TestTargetID = 4A4CE8602F44F56C009C314A;
+					};
+					5A1000512F6A000100000001 = {
+						CreatedOnToolsVersion = 26.0.1;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+					5A1000522F6A000100000001 = {
+						CreatedOnToolsVersion = 26.0.1;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = 4A4CE85C2F44F56C009C314A /* Build configuration list for PBXProject "MindMapAI" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4A4CE8582F44F56C009C314A;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4A4CE8622F44F56C009C314A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4A4CE8602F44F56C009C314A /* MindMapAI */,
+				4A4CE86D2F44F56C009C314A /* MindMapAITests */,
+				4A4CE8772F44F56C009C314A /* MindMapAIUITests */,
+				5A1000512F6A000100000001 /* MindMapShareExtension */,
+				5A1000522F6A000100000001 /* MindMapWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4A4CE85F2F44F56C009C314A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A4CE86C2F44F56C009C314A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A4CE8762F44F56C009C314A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A1000612F6A000100000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A1000622F6A000100000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4A4CE85D2F44F56C009C314A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A4CE86A2F44F56C009C314A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A4CE8742F44F56C009C314A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A1000712F6A000100000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A1000722F6A000100000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4A4CE8702F44F56C009C314A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4A4CE8602F44F56C009C314A /* MindMapAI */;
+			targetProxy = 4A4CE86F2F44F56C009C314A /* PBXContainerItemProxy */;
+		};
+		4A4CE87A2F44F56C009C314A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4A4CE8602F44F56C009C314A /* MindMapAI */;
+			targetProxy = 4A4CE8792F44F56C009C314A /* PBXContainerItemProxy */;
+		};
+		5A1000912F6A000100000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A1000512F6A000100000001 /* MindMapShareExtension */;
+			targetProxy = 5A1000112F6A000100000001 /* PBXContainerItemProxy */;
+		};
+		5A1000922F6A000100000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A1000522F6A000100000001 /* MindMapWidgetExtension */;
+			targetProxy = 5A1000122F6A000100000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4A4CE8802F44F56C009C314A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4A4CE8812F44F56C009C314A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4A4CE8832F44F56C009C314A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = MindMapAppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Config/MindMapAI.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 55DRGHGT2X;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "MindMap AI";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MindMap AI can add your current place to a note so you can find it later by place or on the map. Location is optional, editable, and removable.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyhuang28.MindMapAI;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4A4CE8842F44F56C009C314A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = MindMapAppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Config/MindMapAI.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 55DRGHGT2X;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "MindMap AI";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MindMap AI can add your current place to a note so you can find it later by place or on the map. Location is optional, editable, and removable.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyhuang28.MindMapAI;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4A4CE8862F44F56C009C314A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyhuang28.MindMapAITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MindMapAI.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MindMapAI";
+			};
+			name = Debug;
+		};
+		4A4CE8872F44F56C009C314A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyhuang28.MindMapAITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MindMapAI.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MindMapAI";
+			};
+			name = Release;
+		};
+		4A4CE8892F44F56C009C314A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyhuang28.MindMapAIUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = MindMapAI;
+			};
+			name = Debug;
+		};
+		4A4CE88A2F44F56C009C314A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyhuang28.MindMapAIUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = MindMapAI;
+			};
+			name = Release;
+		};
+		5A1000A12F6A000100000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = MindMapShareExtension/MindMapShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 55DRGHGT2X;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MindMapShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyhuang28.MindMapAI.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5A1000A22F6A000100000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = MindMapShareExtension/MindMapShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 55DRGHGT2X;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MindMapShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyhuang28.MindMapAI.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5A1000B12F6A000100000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = MindMapWidgetExtension/MindMapWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 55DRGHGT2X;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MindMapWidgetExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyhuang28.MindMapAI.WidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5A1000B22F6A000100000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = MindMapWidgetExtension/MindMapWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 55DRGHGT2X;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MindMapWidgetExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jyhuang28.MindMapAI.WidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4A4CE85C2F44F56C009C314A /* Build configuration list for PBXProject "MindMapAI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A4CE8802F44F56C009C314A /* Debug */,
+				4A4CE8812F44F56C009C314A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4A4CE8822F44F56C009C314A /* Build configuration list for PBXNativeTarget "MindMapAI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A4CE8832F44F56C009C314A /* Debug */,
+				4A4CE8842F44F56C009C314A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4A4CE8852F44F56C009C314A /* Build configuration list for PBXNativeTarget "MindMapAITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A4CE8862F44F56C009C314A /* Debug */,
+				4A4CE8872F44F56C009C314A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4A4CE8882F44F56C009C314A /* Build configuration list for PBXNativeTarget "MindMapAIUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A4CE8892F44F56C009C314A /* Debug */,
+				4A4CE88A2F44F56C009C314A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A1000C12F6A000100000001 /* Build configuration list for PBXNativeTarget "MindMapShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A1000A12F6A000100000001 /* Debug */,
+				5A1000A22F6A000100000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A1000C22F6A000100000001 /* Build configuration list for PBXNativeTarget "MindMapWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A1000B12F6A000100000001 /* Debug */,
+				5A1000B22F6A000100000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4A4CE8592F44F56C009C314A /* Project object */;
+}
