@@ -20,3 +20,5 @@ xcuserdata/
 *.xcconfig.local
 Secrets.plist
 Secrets.swift
+# Local build logs
+xcodebuild-output.txt
