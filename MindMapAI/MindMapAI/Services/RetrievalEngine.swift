@@ -25,6 +25,13 @@ struct RetrievalResult: Codable, Hashable, Sendable {
 /// note, applies metadata filters before scoring, and returns every source meeting the configured
 /// threshold. Callers can therefore batch the complete result without silently truncating it.
 nonisolated struct RetrievalEngine: Sendable {
+    private enum TemporalIntent: Equatable {
+        case unspecified
+        case upcoming
+        case completed
+        case both
+    }
+
     struct Configuration: Hashable, Sendable {
         var relevanceThreshold: Double
         var excerptCharacterLimit: Int
@@ -47,6 +54,11 @@ nonisolated struct RetrievalEngine: Sendable {
     private struct TokenMatch {
         var strength: Double
         var isExact: Bool
+    }
+
+    private struct TemporalDate {
+        var date: Date
+        var isDateOnly: Bool
     }
 
     private struct ScoredNote {
@@ -95,7 +107,9 @@ nonisolated struct RetrievalEngine: Sendable {
         "can", "could", "day", "days", "did", "do", "does", "for", "from", "had", "has", "have",
         "how", "i", "in", "into", "is", "it", "know", "me", "my", "note", "notes", "of", "on", "or",
         "our", "past", "plan", "planning", "should", "similar", "that", "the", "their", "then", "these", "this", "to", "us", "was", "we", "were",
-        "what", "when", "where", "which", "who", "why", "will", "with", "would", "you", "your"
+        "what", "when", "where", "which", "who", "why", "will", "with", "would", "you", "your",
+        "already", "am", "completed", "complete", "done", "finished", "future", "going", "next",
+        "need", "needs", "scheduled", "take", "taken", "taking", "upcoming"
     ]
 
     private static let contextLexicons: [(label: String, keywords: Set<String>)] = [
@@ -250,6 +264,9 @@ nonisolated struct RetrievalEngine: Sendable {
         let queryTokens = Self.uniqueTokens(in: cleanedQuery)
         let queryFacets = Self.explicitQueryFacets(in: cleanedQuery)
         let queryContexts = Self.contextLabels(for: queryTokens)
+        let temporalIntent = strictAskMatching
+            ? Self.temporalIntent(for: cleanedQuery)
+            : .unspecified
 
         if cleanedQuery.isEmpty {
             let sources = filteredNotes
@@ -261,10 +278,13 @@ nonisolated struct RetrievalEngine: Sendable {
                             supportType: filters.isActive ? .metadata : .related
                         ),
                         query: "",
-                        queryTokens: []
+                        queryTokens: [],
+                        now: now,
+                        calendar: calendar,
+                        inferRelativeEventDate: strictAskMatching
                     )
                 }
-                .sorted(by: sourceSort)
+                .sorted { sourceSort($0, $1, temporalIntent: temporalIntent) }
             return RetrievalResult(
                 sources: sources,
                 scannedCount: notes.count,
@@ -287,9 +307,20 @@ nonisolated struct RetrievalEngine: Sendable {
             )
         }
 
+        let temporallyScopedNotes = filteredNotes.filter {
+            matchesTemporalIntent(
+                $0,
+                intent: temporalIntent,
+                now: now,
+                calendar: calendar,
+                inferRelativeEventDate: strictAskMatching
+            )
+        }
+
         let tokenWeights = queryTokenWeights(
             queryTokens,
-            in: filteredNotes,
+            in: temporallyScopedNotes,
+            now: now,
             calendar: calendar,
             strict: strictAskMatching
         )
@@ -298,8 +329,8 @@ nonisolated struct RetrievalEngine: Sendable {
         }
 
         var scored: [ScoredNote] = []
-        scored.reserveCapacity(filteredNotes.count)
-        for note in filteredNotes {
+        scored.reserveCapacity(temporallyScopedNotes.count)
+        for note in temporallyScopedNotes {
             guard !Task.isCancelled else {
                 return cancelledResult(scannedCount: notes.count, filteredCount: filteredNotes.count)
             }
@@ -308,6 +339,7 @@ nonisolated struct RetrievalEngine: Sendable {
                 normalizedQuery: Self.normalized(cleanedQuery),
                 queryTokens: queryTokens,
                 queryTokenWeights: tokenWeights,
+                now: now,
                 calendar: calendar,
                 strict: strictAskMatching
             )
@@ -323,6 +355,7 @@ nonisolated struct RetrievalEngine: Sendable {
                         queryTokenWeights: Dictionary(
                             uniqueKeysWithValues: facet.tokens.map { ($0, tokenWeights[$0] ?? 1) }
                         ),
+                        now: now,
                         calendar: calendar,
                         strict: strictAskMatching
                         )
@@ -398,8 +431,17 @@ nonisolated struct RetrievalEngine: Sendable {
         })
 
         let sources = admitted
-            .map { makeSource(from: $0, query: cleanedQuery, queryTokens: queryTokens) }
-            .sorted(by: sourceSort)
+            .map {
+                makeSource(
+                    from: $0,
+                    query: cleanedQuery,
+                    queryTokens: queryTokens,
+                    now: now,
+                    calendar: calendar,
+                    inferRelativeEventDate: strictAskMatching
+                )
+            }
+            .sorted { sourceSort($0, $1, temporalIntent: temporalIntent) }
 
         guard !sources.isEmpty else {
             return RetrievalResult(
@@ -420,7 +462,7 @@ nonisolated struct RetrievalEngine: Sendable {
             let interpretation = interpretVagueQuery(
                 cleanedQuery,
                 sources: sources,
-                notes: filteredNotes,
+                notes: temporallyScopedNotes,
                 filters: filters
             )
             resolution = interpretation.resolution
@@ -602,6 +644,7 @@ nonisolated struct RetrievalEngine: Sendable {
         normalizedQuery: String,
         queryTokens: [String],
         queryTokenWeights: [String: Double],
+        now: Date,
         calendar: Calendar,
         strict: Bool
     ) -> ScoredNote {
@@ -611,8 +654,8 @@ nonisolated struct RetrievalEngine: Sendable {
         let theme = Self.normalized(note.tripTheme)
         let place = Self.normalized([note.place?.name ?? "", note.place?.detail ?? ""].joined(separator: " "))
         let date = Self.normalized([
-            Self.dateMetadata(for: note.createdAt, calendar: calendar),
-            note.eventDate.map { Self.dateMetadata(for: $0, calendar: calendar) } ?? ""
+            Self.dateMetadata(for: note.createdAt, now: now, calendar: calendar),
+            note.eventDate.map { Self.dateMetadata(for: $0, now: now, calendar: calendar) } ?? ""
         ].joined(separator: " "))
         let metadata = [tags, theme, place, date].joined(separator: " ")
 
@@ -716,6 +759,7 @@ nonisolated struct RetrievalEngine: Sendable {
     private func queryTokenWeights(
         _ queryTokens: [String],
         in notes: [MindNote],
+        now: Date,
         calendar: Calendar,
         strict: Bool
     ) -> [String: Double] {
@@ -723,7 +767,7 @@ nonisolated struct RetrievalEngine: Sendable {
         return Dictionary(uniqueKeysWithValues: queryTokens.map { token in
             let matchingDocuments = notes.reduce(into: 0) { count, note in
                 guard !Task.isCancelled else { return }
-                let fields = searchableFieldTokens(for: note, calendar: calendar)
+                let fields = searchableFieldTokens(for: note, now: now, calendar: calendar)
                 let strength = max(
                     Self.bestMatch(for: token, in: fields.title, strict: strict).strength,
                     Self.bestMatch(for: token, in: fields.body, strict: strict).strength,
@@ -740,6 +784,7 @@ nonisolated struct RetrievalEngine: Sendable {
 
     private func searchableFieldTokens(
         for note: MindNote,
+        now: Date,
         calendar: Calendar
     ) -> (title: [String], body: [String], metadata: [String]) {
         let metadata = Self.normalized(
@@ -748,8 +793,8 @@ nonisolated struct RetrievalEngine: Sendable {
                 note.tripTheme,
                 note.place?.name ?? "",
                 note.place?.detail ?? "",
-                Self.dateMetadata(for: note.createdAt, calendar: calendar),
-                note.eventDate.map { Self.dateMetadata(for: $0, calendar: calendar) } ?? ""
+                Self.dateMetadata(for: note.createdAt, now: now, calendar: calendar),
+                note.eventDate.map { Self.dateMetadata(for: $0, now: now, calendar: calendar) } ?? ""
             ].joined(separator: " ")
         )
         return (
@@ -762,9 +807,17 @@ nonisolated struct RetrievalEngine: Sendable {
     private func makeSource(
         from scoredNote: ScoredNote,
         query: String,
-        queryTokens: [String]
+        queryTokens: [String],
+        now: Date,
+        calendar: Calendar,
+        inferRelativeEventDate: Bool
     ) -> SourceReference {
         let note = scoredNote.note
+        let resolvedDate = temporalDate(
+            for: note,
+            calendar: calendar,
+            inferRelativeEventDate: inferRelativeEventDate
+        )
         let displayedExcerpt = contextualizedExcerpt(
             for: note,
             query: query,
@@ -772,16 +825,53 @@ nonisolated struct RetrievalEngine: Sendable {
             semanticPassage: scoredNote.semanticPassage,
             matchingTags: scoredNote.matchingTags,
             includeTheme: scoredNote.includesThemeEvidence,
-            includePlace: scoredNote.includesPlaceEvidence
+            includePlace: true,
+            inferredEventDate: resolvedDate.isDateOnly ? resolvedDate.date : nil
+        )
+        let context = makeSourceContext(
+            for: note,
+            referenceAt: now,
+            matchingTags: scoredNote.matchingTags,
+            includeTheme: scoredNote.includesThemeEvidence,
+            includePlace: true,
+            inferredEventDate: resolvedDate.isDateOnly ? resolvedDate.date : nil
         )
         return SourceReference(
             id: note.id,
             noteID: note.id,
             noteTitle: note.displayTitle,
-            noteDate: note.eventDate ?? note.createdAt,
+            noteDate: resolvedDate.date,
             excerpt: displayedExcerpt,
             score: scoredNote.score,
-            supportType: scoredNote.supportType
+            supportType: scoredNote.supportType,
+            context: context
+        )
+    }
+
+    private func makeSourceContext(
+        for note: MindNote,
+        referenceAt: Date,
+        matchingTags: [String],
+        includeTheme: Bool,
+        includePlace: Bool,
+        inferredEventDate: Date?
+    ) -> SourceContext {
+        let placeName = includePlace ? note.place.map {
+            privacySafeLocationText($0.name, place: $0)
+        } : nil
+        let placeDetail = includePlace ? note.place.map {
+            privacySafeLocationText($0.detail, place: $0)
+        } : nil
+
+        return SourceContext(
+            referenceAt: referenceAt,
+            capturedAt: note.createdAt,
+            eventDate: note.eventDate,
+            inferredEventDate: inferredEventDate,
+            placeName: placeName?.isEmpty == true ? nil : placeName,
+            placeDetail: placeDetail?.isEmpty == true ? nil : placeDetail,
+            tags: matchingTags,
+            theme: includeTheme ? note.tripTheme : nil
         )
     }
 
@@ -792,11 +882,17 @@ nonisolated struct RetrievalEngine: Sendable {
         semanticPassage: String?,
         matchingTags: [String],
         includeTheme: Bool,
-        includePlace: Bool
+        includePlace: Bool,
+        inferredEventDate: Date?
     ) -> String {
-        var context: [String] = [
-            "date: \((note.eventDate ?? note.createdAt).formatted(date: .abbreviated, time: .omitted))"
-        ]
+        var context: [String] = []
+        if let eventDate = note.eventDate {
+            context.append("event date: \(eventDate.formatted(date: .abbreviated, time: .shortened))")
+        }
+        if let inferredEventDate {
+            context.append("mentioned event date: \(inferredEventDate.formatted(date: .abbreviated, time: .omitted))")
+        }
+        context.append("captured: \(note.createdAt.formatted(date: .abbreviated, time: .shortened))")
         if !matchingTags.isEmpty {
             context.append("tags: \(matchingTags.joined(separator: ", "))")
         }
@@ -816,7 +912,10 @@ nonisolated struct RetrievalEngine: Sendable {
 
         let limit = configuration.excerptCharacterLimit
         let labels = "Saved context — \nNote excerpt — "
-        let minimumBodyBudget = max(30, min(120, limit / 2))
+        // Keep enough room for the complete compact context block at the default limit. The
+        // body can be shorter because the full note remains available on-device in the source
+        // inspector, while omitting a place or timestamp would make the handoff misleading.
+        let minimumBodyBudget = max(30, min(64, limit / 3))
         let contextBudget = max(0, limit - labels.count - minimumBodyBudget)
         var contextText = context.joined(separator: "; ")
         if contextText.count > contextBudget {
@@ -1080,10 +1179,141 @@ nonisolated struct RetrievalEngine: Sendable {
         return String(value.prefix(characterLimit - 1)) + "…"
     }
 
-    private func sourceSort(_ lhs: SourceReference, _ rhs: SourceReference) -> Bool {
+    private func sourceSort(
+        _ lhs: SourceReference,
+        _ rhs: SourceReference,
+        temporalIntent: TemporalIntent = .unspecified
+    ) -> Bool {
+        switch temporalIntent {
+        case .upcoming:
+            if lhs.noteDate != rhs.noteDate { return lhs.noteDate < rhs.noteDate }
+        case .completed:
+            if lhs.noteDate != rhs.noteDate { return lhs.noteDate > rhs.noteDate }
+        case .unspecified, .both:
+            break
+        }
         if abs(lhs.score - rhs.score) > 0.000_001 { return lhs.score > rhs.score }
         if lhs.noteDate != rhs.noteDate { return lhs.noteDate > rhs.noteDate }
         return lhs.noteID.uuidString < rhs.noteID.uuidString
+    }
+
+    private func matchesTemporalIntent(
+        _ note: MindNote,
+        intent: TemporalIntent,
+        now: Date,
+        calendar: Calendar,
+        inferRelativeEventDate: Bool
+    ) -> Bool {
+        let resolvedDate = temporalDate(
+            for: note,
+            calendar: calendar,
+            inferRelativeEventDate: inferRelativeEventDate
+        )
+        switch intent {
+        case .unspecified, .both:
+            return true
+        case .upcoming:
+            if resolvedDate.isDateOnly {
+                return calendar.startOfDay(for: resolvedDate.date)
+                    >= calendar.startOfDay(for: now)
+            }
+            return resolvedDate.date >= now
+        case .completed:
+            if resolvedDate.isDateOnly {
+                return calendar.startOfDay(for: resolvedDate.date)
+                    < calendar.startOfDay(for: now)
+            }
+            return resolvedDate.date <= now
+        }
+    }
+
+    private func temporalDate(
+        for note: MindNote,
+        calendar: Calendar,
+        inferRelativeEventDate: Bool
+    ) -> TemporalDate {
+        if let eventDate = note.eventDate {
+            return TemporalDate(date: eventDate, isDateOnly: false)
+        }
+        if inferRelativeEventDate,
+           let inferredEventDate = Self.inferredEventDate(in: note, calendar: calendar) {
+            return TemporalDate(date: inferredEventDate, isDateOnly: true)
+        }
+        return TemporalDate(date: note.createdAt, isDateOnly: false)
+    }
+
+    /// Converts a small, auditable set of relative date phrases into a date anchored to when the
+    /// note was captured. This is deliberately retrieval-time only: the original note remains
+    /// unchanged, and inferred dates are labeled as such before an excerpt can leave the device.
+    private static func inferredEventDate(in note: MindNote, calendar: Calendar) -> Date? {
+        let text = normalized([note.title, note.body].joined(separator: " "))
+        let tokens = tokens(inNormalizedText: text)
+        let anchor = calendar.startOfDay(for: note.createdAt)
+
+        for (index, token) in tokens.enumerated() {
+            switch token {
+            case "today":
+                return anchor
+            case "tomorrow":
+                return calendar.date(byAdding: .day, value: 1, to: anchor)
+            case "yesterday":
+                return calendar.date(byAdding: .day, value: -1, to: anchor)
+            default:
+                guard let targetWeekday = weekdayIndexes[token] else { continue }
+                let previousToken = index > 0 ? tokens[index - 1] : nil
+                let currentWeekday = calendar.component(.weekday, from: anchor)
+                let forwardOffset = (targetWeekday - currentWeekday + 7) % 7
+                let dayOffset: Int
+                if ["last", "previous", "past"].contains(previousToken) {
+                    dayOffset = forwardOffset == 0 ? -7 : forwardOffset - 7
+                } else if previousToken == "next" && forwardOffset == 0 {
+                    dayOffset = 7
+                } else {
+                    // An unqualified weekday means the next occurrence, including today. This
+                    // makes “captured Thursday: take it on Saturday” resolve to that Saturday.
+                    dayOffset = forwardOffset
+                }
+                return calendar.date(byAdding: .day, value: dayOffset, to: anchor)
+            }
+        }
+        return nil
+    }
+
+    private static let weekdayIndexes: [String: Int] = [
+        "sunday": 1, "sun": 1,
+        "monday": 2, "mon": 2,
+        "tuesday": 3, "tue": 3, "tues": 3,
+        "wednesday": 4, "wed": 4,
+        "thursday": 5, "thu": 5, "thur": 5, "thurs": 5,
+        "friday": 6, "fri": 6,
+        "saturday": 7, "sat": 7
+    ]
+
+    /// Determines whether an Ask question is about an upcoming or completed item before any
+    /// lexical or semantic scoring. This keeps opposite-timeframe notes out of the evidence set.
+    private static func temporalIntent(for query: String) -> TemporalIntent {
+        let normalizedQuery = normalized(query)
+        let tokens = Set(tokens(inNormalizedText: normalizedQuery))
+        let futureTokens: Set<String> = [
+            "deadline", "due", "future", "next", "scheduled", "upcoming", "will"
+        ]
+        let completedTokens: Set<String> = [
+            "already", "attended", "completed", "did", "done", "finished", "last",
+            "past", "previous", "taken", "was", "were"
+        ]
+        let hasFutureSignal = !tokens.isDisjoint(with: futureTokens)
+            || ["going to", "have to", "need to", "plan to", "still need", "yet to", "when do i", "what do i need"]
+                .contains { normalizedQuery.contains($0) }
+        let hasCompletedSignal = !tokens.isDisjoint(with: completedTokens)
+            || ["did i", "have i", "i ve taken", "i ve done", "what have i", "what did i"]
+                .contains { normalizedQuery.contains($0) }
+
+        switch (hasFutureSignal, hasCompletedSignal) {
+        case (true, true): return .both
+        case (true, false): return .upcoming
+        case (false, true): return .completed
+        case (false, false): return .unspecified
+        }
     }
 
     private func interpretVagueQuery(
@@ -1092,6 +1322,14 @@ nonisolated struct RetrievalEngine: Sendable {
         notes: [MindNote],
         filters: RetrievalFilters
     ) -> (resolution: RetrievalResolution, assumption: String, clarification: String) {
+        // A single exact-text source is already a resolved answer target. Do not turn a precise
+        // question such as “Where is OrionExam scheduled?” into an unnecessary clarification
+        // merely because the question words were removed as stop words and only the identifier
+        // remains searchable.
+        if sources.count == 1, sources.first?.supportType == .exactText {
+            return (.ready, "", "")
+        }
+
         let notesByID = Dictionary(uniqueKeysWithValues: notes.map { ($0.id, $0) })
         var contextWeights: [String: Double] = [:]
         for source in sources {
@@ -1376,11 +1614,16 @@ nonisolated struct RetrievalEngine: Sendable {
         return result
     }
 
-    private static func dateMetadata(for date: Date, calendar: Calendar) -> String {
-        let components = calendar.dateComponents([.year, .month, .day], from: date)
+    private static func dateMetadata(for date: Date, now: Date, calendar: Calendar) -> String {
+        let components = calendar.dateComponents(
+            [.year, .month, .day, .hour, .minute],
+            from: date
+        )
         let year = components.year ?? 0
         let month = components.month ?? 0
         let day = components.day ?? 0
+        let hour = components.hour ?? 0
+        let minute = components.minute ?? 0
         var parts = [
             String(year),
             String(month),
@@ -1390,6 +1633,36 @@ nonisolated struct RetrievalEngine: Sendable {
         if (1...12).contains(month) {
             parts.append(monthNames[month - 1])
             parts.append(shortMonthNames[month - 1])
+        }
+
+        let hour12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour)
+        parts.append(contentsOf: [
+            "time",
+            String(hour),
+            String(hour12),
+            String(format: "%02d", minute),
+            hour < 12 ? "am" : "pm"
+        ])
+
+        switch hour {
+        case 5..<12:
+            parts.append("morning")
+        case 12..<17:
+            parts.append("afternoon")
+        case 17..<21:
+            parts.append("evening")
+        default:
+            parts.append("night")
+        }
+
+        if calendar.isDate(date, inSameDayAs: now) {
+            parts.append("today")
+        } else if let yesterday = calendar.date(byAdding: .day, value: -1, to: now),
+                  calendar.isDate(date, inSameDayAs: yesterday) {
+            parts.append("yesterday")
+        } else if let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
+                  calendar.isDate(date, inSameDayAs: tomorrow) {
+            parts.append("tomorrow")
         }
         return parts.joined(separator: " ")
     }

@@ -65,6 +65,28 @@ struct RetrievalSemanticTests {
         #expect(result.sources.map(\.noteID) == [note.id])
     }
 
+    @Test("A single exact-text match does not trigger unnecessary clarification")
+    func preciseQuestionUsesExactMatch() {
+        let now = Date(timeIntervalSince1970: 1_787_846_400)
+        let note = MindNote(
+            body: "OrionExam is scheduled in room 204 on Friday.",
+            createdAt: now,
+            updatedAt: now
+        )
+        let result = RetrievalEngine(
+            semanticMatcher: UnavailableSemanticMatcher()
+        ).retrieve(
+            question: "Where is OrionExam scheduled?",
+            from: [note],
+            now: now,
+            calendar: Calendar(identifier: .gregorian)
+        )
+
+        #expect(result.sources.map(\.noteID) == [note.id])
+        #expect(result.resolution == .ready)
+        #expect(result.clarificationQuestion.isEmpty)
+    }
+
     @Test("Explicit query facets can retrieve separate notes without weakening unsplit queries")
     func multiTopicDecomposition() {
         let train = MindNote(body: "The train departs from Union Station at 10:40 PM.")

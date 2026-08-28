@@ -134,6 +134,77 @@ nonisolated enum SourceSupportType: String, Codable, Sendable {
     case related = "Related note"
 }
 
+/// Context captured alongside a retrieved note. Location fields are intentionally
+/// human-readable only; precise coordinates remain on-device.
+nonisolated struct SourceContext: Codable, Hashable, Sendable {
+    var referenceAt: Date?
+    var capturedAt: Date?
+    var eventDate: Date?
+    /// A date derived from relative language in the note, such as “on Saturday”. It is kept
+    /// separate from `eventDate` so the UI and model can distinguish saved metadata from an
+    /// auditable retrieval inference.
+    var inferredEventDate: Date?
+    var placeName: String?
+    var placeDetail: String?
+    var tags: [String]
+    var theme: String?
+
+    init(
+        referenceAt: Date? = nil,
+        capturedAt: Date? = nil,
+        eventDate: Date? = nil,
+        inferredEventDate: Date? = nil,
+        placeName: String? = nil,
+        placeDetail: String? = nil,
+        tags: [String] = [],
+        theme: String? = nil
+    ) {
+        self.referenceAt = referenceAt
+        self.capturedAt = capturedAt
+        self.eventDate = eventDate
+        self.inferredEventDate = inferredEventDate
+        self.placeName = placeName
+        self.placeDetail = placeDetail
+        self.tags = tags
+        self.theme = theme
+    }
+
+    var locationLabel: String? {
+        let parts = [placeName, placeDetail]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        return parts.isEmpty ? nil : parts.joined(separator: " — ")
+    }
+
+    /// Human-readable context for the provider. Explicit labels prevent the model from
+    /// mistaking capture time for the time of the event described by the note.
+    var promptDescription: String {
+        var lines: [String] = []
+        if let referenceAt {
+            lines.append("reference_at: \(referenceAt.formatted(date: .abbreviated, time: .shortened))")
+        }
+        if let capturedAt {
+            lines.append("captured_at: \(capturedAt.formatted(date: .abbreviated, time: .shortened))")
+        }
+        if let eventDate {
+            lines.append("event_at: \(eventDate.formatted(date: .abbreviated, time: .shortened))")
+        }
+        if let inferredEventDate {
+            lines.append("mentioned_event_at: \(inferredEventDate.formatted(date: .abbreviated, time: .omitted)) (derived from note text)")
+        }
+        if let locationLabel {
+            lines.append("place: \(locationLabel)")
+        }
+        if !tags.isEmpty {
+            lines.append("matched_tags: \(tags.joined(separator: ", "))")
+        }
+        if let theme = theme?.trimmingCharacters(in: .whitespacesAndNewlines), !theme.isEmpty {
+            lines.append("theme: \(theme)")
+        }
+        return lines.joined(separator: "; ")
+    }
+}
+
 nonisolated struct SourceReference: Identifiable, Codable, Hashable, Sendable {
     var id: UUID = UUID()
     var noteID: UUID
@@ -142,6 +213,8 @@ nonisolated struct SourceReference: Identifiable, Codable, Hashable, Sendable {
     var excerpt: String
     var score: Double
     var supportType: SourceSupportType
+    /// Optional so source references created before contextual retrieval remain readable.
+    var context: SourceContext? = nil
 }
 
 nonisolated struct ClaimEvidence: Identifiable, Codable, Hashable, Sendable {
@@ -286,6 +359,9 @@ struct AskSession: Identifiable, Codable, Hashable, Sendable {
     var retrievalAssumption: String = ""
     var clarificationQuestion: String = ""
     var errorMessage: String = ""
+    /// Provider text retained only in memory when strict grounding fails. Ask may display it
+    /// only after an explicit user choice, and it is never eligible for plan saving.
+    var unverifiedResponse: String? = nil
     var conclusion: GroundedConclusion?
 }
 

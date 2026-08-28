@@ -35,6 +35,10 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>MindMap AI can add your current place to a note so you can find it later by place or on the map. Location is optional, editable, and removable.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>MindMap AI uses the camera when you choose to add a photo or record a video for a saved place.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>MindMap AI uses the microphone when you choose to record a voice note or video for a saved place.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

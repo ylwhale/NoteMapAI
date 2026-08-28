@@ -420,6 +420,193 @@ struct MindMapAITests {
         #expect(!DateFilter.thirtyDays.includes(now.addingTimeInterval(86_400), now: now))
     }
 
+    @Test("Retrieved sources preserve note time, event date, place, and matched tags")
+    func retrievalPreservesContextForEvidenceAndAI() {
+        let calendar = Calendar(identifier: .gregorian)
+        let capturedAt = Date(timeIntervalSince1970: 1_800_000_000)
+        let eventDate = Date(timeIntervalSince1970: 1_800_086_340)
+        let place = SavedPlace(
+            name: "North Hall",
+            detail: "Chicago",
+            latitude: 41.8781,
+            longitude: -87.6295
+        )
+        let note = MindNote(
+            title: "Quiz reminder",
+            body: "Professor Rivera said to complete the online quiz.",
+            createdAt: capturedAt,
+            updatedAt: capturedAt,
+            eventDate: eventDate,
+            place: place,
+            acceptedTags: ["quiz", "course"]
+        )
+
+        let source = RetrievalEngine().retrieve(
+            question: "quiz",
+            from: [note],
+            now: capturedAt,
+            calendar: calendar
+        ).sources.first
+
+        #expect(source?.context?.referenceAt == capturedAt)
+        #expect(source?.context?.capturedAt == capturedAt)
+        #expect(source?.context?.eventDate == eventDate)
+        #expect(source?.context?.locationLabel == "North Hall — Chicago")
+        #expect(source?.context?.tags == ["quiz"])
+        #expect(source?.excerpt.contains("event date:") == true)
+        #expect(source?.excerpt.contains("captured:") == true)
+        #expect(source?.excerpt.contains("North Hall") == true)
+        #expect(source?.excerpt.contains("quiz") == true)
+    }
+
+    @Test("Time-of-day context can answer local retrieval questions")
+    func retrievalUsesCaptureTimeContext() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let now = calendar.date(
+            from: DateComponents(year: 2027, month: 1, day: 15, hour: 9)
+        )!
+        let morningNote = MindNote(
+            body: "Review the quiz rubric.",
+            createdAt: calendar.date(
+                from: DateComponents(year: 2027, month: 1, day: 15, hour: 10)
+            )!,
+            updatedAt: calendar.date(
+                from: DateComponents(year: 2027, month: 1, day: 15, hour: 10)
+            )!
+        )
+        let eveningNote = MindNote(
+            body: "Review the quiz rubric.",
+            createdAt: calendar.date(
+                from: DateComponents(year: 2027, month: 1, day: 15, hour: 20)
+            )!,
+            updatedAt: calendar.date(
+                from: DateComponents(year: 2027, month: 1, day: 15, hour: 20)
+            )!
+        )
+
+        let result = RetrievalEngine().retrieve(
+            question: "morning",
+            from: [eveningNote, morningNote],
+            now: now,
+            calendar: calendar
+        )
+
+        #expect(result.sources.map(\.noteID) == [morningNote.id])
+    }
+
+    @Test("Ask temporal intent excludes the opposite timeframe and ranks by date")
+    func retrievalUsesUpcomingAndCompletedTimeframes() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let now = calendar.date(
+            from: DateComponents(year: 2027, month: 1, day: 15, hour: 12)
+        )!
+        func date(_ day: Int, _ hour: Int) -> Date {
+            calendar.date(
+                from: DateComponents(year: 2027, month: 1, day: day, hour: hour)
+            )!
+        }
+        func quizNote(_ title: String, day: Int, hour: Int) -> MindNote {
+            let eventDate = date(day, hour)
+            return MindNote(
+                title: title,
+                body: "Online quiz",
+                createdAt: eventDate.addingTimeInterval(-86_400),
+                updatedAt: eventDate.addingTimeInterval(-86_400),
+                eventDate: eventDate,
+                acceptedTags: ["quiz"]
+            )
+        }
+
+        let olderCompleted = quizNote("Older quiz", day: 5, hour: 10)
+        let recentCompleted = quizNote("Recent quiz", day: 12, hour: 10)
+        let soonUpcoming = quizNote("Soon quiz", day: 16, hour: 10)
+        let laterUpcoming = quizNote("Later quiz", day: 20, hour: 10)
+        let notes = [laterUpcoming, olderCompleted, soonUpcoming, recentCompleted]
+        let engine = RetrievalEngine()
+
+        let upcoming = engine.retrieve(
+            question: "Which quiz am I going to take?",
+            from: notes,
+            now: now,
+            calendar: calendar
+        )
+        #expect(upcoming.sources.map(\.noteID) == [soonUpcoming.id, laterUpcoming.id])
+
+        let completed = engine.retrieve(
+            question: "Which quiz have I taken?",
+            from: notes,
+            now: now,
+            calendar: calendar
+        )
+        #expect(completed.sources.map(\.noteID) == [recentCompleted.id, olderCompleted.id])
+    }
+
+    @Test("Ask derives relative weekday dates and keeps all upcoming evidence")
+    func retrievalInfersRelativeWeekdayEventDate() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let now = calendar.date(
+            from: DateComponents(year: 2026, month: 8, day: 27, hour: 14, minute: 32)
+        )!
+        let capturedAt = calendar.date(
+            from: DateComponents(year: 2026, month: 8, day: 27, hour: 1, minute: 33)
+        )!
+        let saturday = calendar.date(
+            from: DateComponents(year: 2026, month: 8, day: 29)
+        )!
+        let deadline = calendar.date(
+            from: DateComponents(year: 2026, month: 9, day: 15, hour: 23, minute: 59)
+        )!
+        let pastNote = MindNote(
+            body: "Professor said we needed to take the online quiz before Tuesday.",
+            createdAt: calendar.date(
+                from: DateComponents(year: 2026, month: 8, day: 23, hour: 12)
+            )!,
+            updatedAt: capturedAt,
+            acceptedTags: ["quiz"]
+        )
+        let relativeNote = MindNote(
+            body: "Professor said we need to take an online quiz on Saturday.",
+            createdAt: capturedAt,
+            updatedAt: capturedAt,
+            acceptedTags: ["quiz"]
+        )
+        let deadlineNote = MindNote(
+            title: "[MMTEST] Online quiz deadline",
+            body: "Professor Rivera said the online quiz must be completed by Tuesday, September 15 at 11:59 PM.",
+            createdAt: calendar.date(
+                from: DateComponents(year: 2026, month: 8, day: 21, hour: 13, minute: 5)
+            )!,
+            updatedAt: capturedAt,
+            eventDate: deadline,
+            acceptedTags: ["quiz"]
+        )
+
+        let result = RetrievalEngine().retrieve(
+            question: "When do I need to take an online quiz?",
+            from: [pastNote, deadlineNote, relativeNote],
+            now: now,
+            calendar: calendar
+        )
+
+        #expect(result.sources.map(\.noteID) == [relativeNote.id, deadlineNote.id])
+        let relativeSource = result.sources.first { $0.noteID == relativeNote.id }
+        #expect(relativeSource?.noteDate == saturday)
+        #expect(relativeSource?.context?.eventDate == nil)
+        #expect(relativeSource?.context?.inferredEventDate == saturday)
+        #expect(relativeSource?.excerpt.contains("mentioned event date:") == true)
+
+        let completed = RetrievalEngine().retrieve(
+            question: "Which online quiz have I taken?",
+            from: [pastNote, deadlineNote, relativeNote],
+            now: now,
+            calendar: calendar
+        )
+        #expect(completed.sources.map(\.noteID) == [pastNote.id])
+    }
+
     @Test("Tag suggestions stay bounded and prefer an existing matching label")
     func tagsPreferExistingLabels() {
         let note = MindNote(body: "Weekend trip: check the last train and hotel cost.")

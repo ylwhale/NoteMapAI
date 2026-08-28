@@ -16,10 +16,12 @@ struct AskView: View {
     @State private var showsFilters = false
     @State private var showsDisclosure = false
     @State private var selectedSource: SourceReference?
+    @State private var selectedOriginalNote: MindNote?
     @State private var selectedSourceIDs: Set<UUID> = []
     @State private var activeTask: Task<Void, Never>?
     @State private var saveMessage: String?
     @State private var sourceVersions: [UUID: Date] = [:]
+    @State private var showsUnverifiedResponse = false
     @FocusState private var questionFocused: Bool
 
     private let retrievalEngine = RetrievalEngine()
@@ -38,6 +40,11 @@ struct AskView: View {
 
                     if session.phase != .idle {
                         statusContent
+                    }
+
+                    if showsUnverifiedResponse,
+                       let response = session.unverifiedResponse {
+                        unverifiedResponseSection(response)
                     }
 
                     if !session.retrievalAssumption.isEmpty {
@@ -86,6 +93,9 @@ struct AskView: View {
                     note: store.note(withID: source.noteID)
                 )
             }
+            .sheet(item: $selectedOriginalNote) { note in
+                OriginalNoteSheet(note: note)
+            }
             .alert("Plan saved", isPresented: Binding(
                 get: { saveMessage != nil },
                 set: { if !$0 { saveMessage = nil } }
@@ -122,7 +132,7 @@ struct AskView: View {
             Text("Turn fragments into a supported answer")
                 .mindMapTextStyle(.screenTitle)
                 .accessibilityAddTraits(.isHeader)
-            Text("MindMap AI searches your entire local library first, then uses only the evidence you can inspect below.")
+            Text("MindMap AI searches note text, tags, dates, times, and saved places locally, then uses only the evidence you can inspect below.")
                 .mindMapTextStyle(.supporting)
         }
     }
@@ -202,7 +212,7 @@ struct AskView: View {
                 title: "Review what will be sent",
                 message: selectedSourceIDs.isEmpty
                     ? "Select at least one exact excerpt below before asking the AI to generate a conclusion."
-                    : "Only the \(selectedSourceIDs.count) selected excerpt\(selectedSourceIDs.count == 1 ? "" : "s") and your question will be included in the AI request."
+                    : "Only the \(selectedSourceIDs.count) selected excerpt\(selectedSourceIDs.count == 1 ? "" : "s"), their labeled time/date context, matched tags, saved places, and your question will be included in the AI request."
             ) {
                 MindMapPrimaryButton(
                     title: "Generate with \(selectedSourceIDs.count) excerpt\(selectedSourceIDs.count == 1 ? "" : "s")",
@@ -284,12 +294,16 @@ struct AskView: View {
                 }
             }
         case .failed:
-            MindMapErrorCallout(
-                title: "Conclusion not created",
-                message: session.errorMessage,
-                retryTitle: "Retry",
-                onRetry: retryGeneration
-            )
+            if session.unverifiedResponse != nil {
+                unverifiedResponseFailure
+            } else {
+                MindMapErrorCallout(
+                    title: "Conclusion not created",
+                    message: session.errorMessage,
+                    retryTitle: "Retry",
+                    onRetry: retryGeneration
+                )
+            }
         case .cancelled:
             MindMapCallout(
                 kind: .info,
@@ -315,8 +329,8 @@ struct AskView: View {
             MindMapSectionHeader(
                 title: "Evidence",
                 subtitle: canEditSourceSelection
-                    ? "Review the exact local excerpts and choose which ones may be sent."
-                    : "Ranked local matches. Tap any source to inspect the exact excerpt."
+                    ? "Review the exact local excerpts and choose which ones may be sent. Tap a note to inspect its original content."
+                    : "Ranked local matches using note text and saved or inferred context; time-based questions use the current date and event order. Tap any source to inspect the exact excerpt."
             )
 
             ViewThatFits(in: .horizontal) {
@@ -369,6 +383,7 @@ struct AskView: View {
                             source: source,
                             isSelected: selectedSourceIDs.contains(source.id),
                             onToggle: { toggleSourceSelection(source.id) },
+                            onOpenNote: { selectedOriginalNote = store.note(withID: source.noteID) },
                             onInspect: { selectedSource = source }
                         )
                     } else {
@@ -385,6 +400,68 @@ struct AskView: View {
                         .accessibilityHint("Shows the supporting excerpt and original note")
                     }
                 }
+            }
+        }
+    }
+
+    private var unverifiedResponseFailure: some View {
+        MindMapCallout(
+            kind: .warning,
+            title: "Response not verified",
+            message: session.errorMessage.isEmpty
+                ? "The AI returned text, but its source IDs or quotes did not match the exact displayed excerpts. It may contain unsupported or altered details."
+                : session.errorMessage
+        ) {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: MindMapSpacing.small) {
+                    showUnverifiedResponseButton
+                    retryUnverifiedResponseButton
+                }
+                VStack(alignment: .leading, spacing: MindMapSpacing.small) {
+                    showUnverifiedResponseButton
+                    retryUnverifiedResponseButton
+                }
+            }
+        }
+    }
+
+    private var showUnverifiedResponseButton: some View {
+        MindMapSecondaryButton(
+            title: showsUnverifiedResponse ? "Hide response" : "Show unverified response",
+            systemImage: showsUnverifiedResponse ? "eye.slash" : "eye",
+            expands: false,
+            action: { showsUnverifiedResponse.toggle() }
+        )
+        .accessibilityIdentifier("ask_show_unverified_response")
+    }
+
+    private var retryUnverifiedResponseButton: some View {
+        MindMapSecondaryButton(
+            title: "Retry",
+            systemImage: "arrow.clockwise",
+            expands: false,
+            action: retryGeneration
+        )
+    }
+
+    private func unverifiedResponseSection(_ response: String) -> some View {
+        VStack(alignment: .leading, spacing: MindMapSpacing.medium) {
+            MindMapSectionHeader(
+                title: "Unverified AI response",
+                subtitle: "Displayed because you chose to view it. Check every statement against the exact excerpts before relying on or sharing it."
+            )
+            MindMapCallout(
+                kind: .warning,
+                title: "Not verified against displayed excerpts",
+                message: "This response may contain unsupported or altered details. It is not eligible for saving as a grounded conclusion or plan."
+            )
+            MindMapCard(elevated: false) {
+                Text(response)
+                    .mindMapTextStyle(.body)
+                    .foregroundStyle(MindMapTheme.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
+                    .accessibilityIdentifier("ai_unverified_response")
             }
         }
     }
@@ -434,7 +511,7 @@ struct AskView: View {
         VStack(alignment: .leading, spacing: MindMapSpacing.medium) {
             MindMapSectionHeader(
                 title: "Grounded conclusion",
-                subtitle: "AI draft - verify the linked sources before reusing it."
+                subtitle: "Direct answer first, followed by supporting details and optional next steps."
             )
 
             if conclusion.directAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -446,7 +523,7 @@ struct AskView: View {
             } else {
                 MindMapCard {
                     VStack(alignment: .leading, spacing: MindMapSpacing.large) {
-                        Text("Answer parts")
+                        Text("Answer")
                             .font(.caption.weight(.bold))
                             .foregroundStyle(MindMapTheme.source)
                             .accessibilityIdentifier("ai_synthesized_answer")
@@ -625,7 +702,7 @@ struct AskView: View {
                                 .mindMapTextStyle(.cardTitle)
                             Text(item.answerSummary)
                                 .mindMapTextStyle(.supporting)
-                                .lineLimit(2)
+                                .accessibilityIdentifier("ask_history_answer_summary")
                             Text("\(item.sourceCount) sources - \(item.createdAt.formatted(date: .abbreviated, time: .shortened))")
                                 .mindMapTextStyle(.caption)
                         }
@@ -745,6 +822,7 @@ struct AskView: View {
         activeTask = nil
         session = AskSession(question: question, filters: filters)
         sourceVersions = [:]
+        showsUnverifiedResponse = false
         selectedSourceIDs = []
         selectedSource = nil
         saveMessage = nil
@@ -757,8 +835,11 @@ struct AskView: View {
         activeTask?.cancel()
         let filterSnapshot = filtersBinding.wrappedValue
         let noteSnapshot = store.notes
+        let referenceNow = Date()
+        let referenceCalendar = Calendar.current
         let versionSnapshot = Dictionary(uniqueKeysWithValues: noteSnapshot.map { ($0.id, $0.updatedAt) })
         let engine = retrievalEngine
+        showsUnverifiedResponse = false
         session = AskSession(question: question, filters: filterSnapshot, phase: .searching)
 
         activeTask = Task { @MainActor in
@@ -769,7 +850,9 @@ struct AskView: View {
                 engine.retrieve(
                     question: question,
                     from: noteSnapshot,
-                    filters: filterSnapshot
+                    filters: filterSnapshot,
+                    now: referenceNow,
+                    calendar: referenceCalendar
                 )
             }
             let result = await withTaskCancellationHandler(
@@ -856,6 +939,9 @@ struct AskView: View {
                 : "Review the AI processing disclosure before any excerpt can leave this device."
             return
         }
+
+        session.unverifiedResponse = nil
+        showsUnverifiedResponse = false
 
         guard sourcesAreCurrent else {
             session.conclusion = nil
@@ -944,7 +1030,13 @@ struct AskView: View {
                     session.phase = .cancelled
                 }
             } catch let error as AIProviderError {
-                session.errorMessage = error.localizedDescription
+                if case let .unverifiedResponse(response) = error {
+                    session.unverifiedResponse = response
+                    showsUnverifiedResponse = false
+                    session.errorMessage = "The AI returned text, but its source IDs or quotes did not match the exact displayed excerpts. You can show it with a warning or retry."
+                } else {
+                    session.errorMessage = error.localizedDescription
+                }
                 session.phase = error == .noEvidence ? .noEvidence : .failed
             } catch {
                 session.errorMessage = error.localizedDescription
@@ -1174,6 +1266,8 @@ struct AskView: View {
     ]
 
     private func retryGeneration() {
+        showsUnverifiedResponse = false
+        session.unverifiedResponse = nil
         if session.sources.isEmpty || !sourcesAreCurrent {
             submit()
         } else if store.preferences.aiProcessingConsent == .undecided {
@@ -1229,6 +1323,8 @@ struct AskView: View {
         activeTask?.cancel()
         activeTask = nil
         selectedSource = nil
+        showsUnverifiedResponse = false
+        session.unverifiedResponse = nil
         session.conclusion = nil
         session.phase = .failed
         session.errorMessage = "A retrieved source was edited or deleted. Your question and filters are preserved; retry to refresh the evidence."
@@ -1305,6 +1401,7 @@ private struct SourceSelectionCard: View {
     let source: SourceReference
     let isSelected: Bool
     let onToggle: () -> Void
+    let onOpenNote: () -> Void
     let onInspect: () -> Void
 
     var body: some View {
@@ -1328,12 +1425,19 @@ private struct SourceSelectionCard: View {
                     )
                     .accessibilityHint("Controls whether this exact excerpt may be sent to OpenAI")
 
-                    VStack(alignment: .leading, spacing: MindMapSpacing.xSmall) {
-                        Text(source.noteTitle)
-                            .mindMapTextStyle(.cardTitle)
-                        Text(source.noteDate.formatted(date: .abbreviated, time: .shortened))
-                            .mindMapTextStyle(.caption)
+                    Button(action: onOpenNote) {
+                        VStack(alignment: .leading, spacing: MindMapSpacing.xSmall) {
+                            Text(source.noteTitle)
+                                .mindMapTextStyle(.cardTitle)
+                            Text(source.noteDate.formatted(date: .abbreviated, time: .shortened))
+                                .mindMapTextStyle(.caption)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Open original note \(source.noteTitle)")
+                    .accessibilityHint("Shows the exact excerpt and original note")
 
                     Spacer(minLength: MindMapSpacing.small)
 
@@ -1342,11 +1446,21 @@ private struct SourceSelectionCard: View {
                         .foregroundStyle(MindMapTheme.coverage)
                 }
 
-                Text("“\(source.excerpt)”")
-                    .mindMapTextStyle(.body)
-                    .foregroundStyle(MindMapTheme.textPrimary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .textSelection(.enabled)
+                if let context = source.context {
+                    SourceContextSummary(context: context)
+                }
+
+                Button(action: onOpenNote) {
+                    Text("“\(source.excerpt)”")
+                        .mindMapTextStyle(.body)
+                        .foregroundStyle(MindMapTheme.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Open original note body from \(source.noteTitle)")
+                .accessibilityHint("Shows the exact excerpt and original note")
 
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: MindMapSpacing.small) {
@@ -1402,6 +1516,10 @@ private struct SourceReferenceCard: View {
                         .foregroundStyle(MindMapTheme.coverage)
                 }
 
+                if let context = source.context {
+                    SourceContextSummary(context: context)
+                }
+
                 Text("“\(source.excerpt)”")
                     .mindMapTextStyle(.body)
                     .foregroundStyle(MindMapTheme.textPrimary)
@@ -1419,6 +1537,84 @@ private struct SourceReferenceCard: View {
                 }
             }
         }
+    }
+}
+
+private struct SourceContextSummary: View {
+    let context: SourceContext
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: MindMapSpacing.small) {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: MindMapSpacing.small) {
+                    temporalLabels
+                }
+                VStack(alignment: .leading, spacing: MindMapSpacing.xSmall) {
+                    temporalLabels
+                }
+            }
+
+            if let locationLabel = context.locationLabel {
+                Label(locationLabel, systemImage: "mappin.and.ellipse")
+                    .lineLimit(2)
+            }
+
+            if !context.tags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: MindMapSpacing.xSmall) {
+                        ForEach(context.tags, id: \.self) { tag in
+                            MindMapTagChip(title: tag, systemImage: "number")
+                        }
+                    }
+                }
+            }
+        }
+        .font(.caption)
+        .foregroundStyle(MindMapTheme.textSecondary)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityText)
+    }
+
+    @ViewBuilder
+    private var temporalLabels: some View {
+        if let eventDate = context.eventDate {
+            Label(
+                eventDate.formatted(date: .abbreviated, time: .shortened),
+                systemImage: "calendar"
+            )
+        }
+        if let inferredEventDate = context.inferredEventDate {
+            Label(
+                "Mentioned \(inferredEventDate.formatted(date: .abbreviated, time: .omitted))",
+                systemImage: "calendar.badge.clock"
+            )
+        }
+        if let capturedAt = context.capturedAt {
+            Label(
+                capturedAt.formatted(date: .abbreviated, time: .shortened),
+                systemImage: "clock"
+            )
+        }
+    }
+
+    private var accessibilityText: String {
+        var parts: [String] = []
+        if let eventDate = context.eventDate {
+            parts.append("Event \(eventDate.formatted(date: .abbreviated, time: .shortened))")
+        }
+        if let inferredEventDate = context.inferredEventDate {
+            parts.append("Mentioned event \(inferredEventDate.formatted(date: .abbreviated, time: .omitted))")
+        }
+        if let capturedAt = context.capturedAt {
+            parts.append("Captured \(capturedAt.formatted(date: .abbreviated, time: .shortened))")
+        }
+        if let locationLabel = context.locationLabel {
+            parts.append("Place \(locationLabel)")
+        }
+        if !context.tags.isEmpty {
+            parts.append("Tags \(context.tags.joined(separator: ", "))")
+        }
+        return parts.joined(separator: ". ")
     }
 }
 
@@ -1443,7 +1639,7 @@ private struct AIProcessingDisclosureView: View {
                         .mindMapTextStyle(.screenTitle)
                         .accessibilityAddTraits(.isHeader)
 
-                    Text("You selected \(sourceCount) exact excerpt\(sourceCount == 1 ? "" : "s") after local retrieval. If you continue, only your question, those selected excerpts, and any retrieval assumption displayed on the Ask screen are sent to OpenAI. Unselected excerpts and other notes are not sent. Precise coordinates are removed from saved location fields; coordinates you typed into selected note text remain part of that excerpt.")
+                    Text("You selected \(sourceCount) exact excerpt\(sourceCount == 1 ? "" : "s") after local retrieval. If you continue, only your question, those selected excerpts, and their labeled context—capture time, event date, matched tags, and human-readable place—are sent to OpenAI. Unselected excerpts and other notes are not sent. Precise coordinates are removed from saved location fields; coordinates you typed into selected note text remain part of that excerpt.")
                         .mindMapTextStyle(.body)
 
                     if !retrievalAssumption.isEmpty {
@@ -1475,6 +1671,60 @@ private struct AIProcessingDisclosureView: View {
     }
 }
 
+private struct OriginalNoteSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let note: MindNote
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: MindMapSpacing.xLarge) {
+                    MindMapCard {
+                        VStack(alignment: .leading, spacing: MindMapSpacing.medium) {
+                            Text("Original note")
+                                .mindMapTextStyle(.screenTitle)
+
+                            if !note.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                Text("Topic")
+                                    .mindMapTextStyle(.cardTitle)
+                                Text(note.title)
+                                    .mindMapTextStyle(.body)
+                                    .textSelection(.enabled)
+                            }
+
+                            Text("Body")
+                                .mindMapTextStyle(.cardTitle)
+                            Text(note.body)
+                                .mindMapTextStyle(.body)
+                                .textSelection(.enabled)
+
+                            if !note.acceptedTags.isEmpty {
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        ForEach(note.acceptedTags, id: \.self) { tag in
+                                            MindMapTagChip(title: tag)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(MindMapSpacing.large)
+                .mindMapReadableWidth()
+            }
+            .background(MindMapTheme.background.ignoresSafeArea())
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                        .frame(minHeight: MindMapLayout.minimumTapTarget)
+                }
+            }
+        }
+    }
+}
+
 private struct SourceEvidenceSheet: View {
     @Environment(\.dismiss) private var dismiss
 
@@ -1490,6 +1740,10 @@ private struct SourceEvidenceSheet: View {
                             .mindMapTextStyle(.screenTitle)
                         Text(source.noteDate.formatted(date: .long, time: .shortened))
                             .mindMapTextStyle(.supporting)
+                    }
+
+                    if let context = source.context {
+                        SourceContextSummary(context: context)
                     }
 
                     MindMapCallout(

@@ -18,7 +18,7 @@
                BlueprintIdentifier = "4A4CE8602F44F56C009C314A"
                BuildableName = "MindMapAI.app"
                BlueprintName = "MindMapAI"
-               ReferencedContainer = "container:MindMapAI.xcodeproj">
+               ReferencedContainer = "container:NoteMap AI.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -38,7 +38,7 @@
                BlueprintIdentifier = "4A4CE86D2F44F56C009C314A"
                BuildableName = "MindMapAITests.xctest"
                BlueprintName = "MindMapAITests"
-               ReferencedContainer = "container:MindMapAI.xcodeproj">
+               ReferencedContainer = "container:NoteMap AI.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -49,7 +49,7 @@
                BlueprintIdentifier = "4A4CE8772F44F56C009C314A"
                BuildableName = "MindMapAIUITests.xctest"
                BlueprintName = "MindMapAIUITests"
-               ReferencedContainer = "container:MindMapAI.xcodeproj">
+               ReferencedContainer = "container:NoteMap AI.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -71,7 +71,7 @@
             BlueprintIdentifier = "4A4CE8602F44F56C009C314A"
             BuildableName = "MindMapAI.app"
             BlueprintName = "MindMapAI"
-            ReferencedContainer = "container:MindMapAI.xcodeproj">
+            ReferencedContainer = "container:NoteMap AI.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -88,7 +88,7 @@
             BlueprintIdentifier = "4A4CE8602F44F56C009C314A"
             BuildableName = "MindMapAI.app"
             BlueprintName = "MindMapAI"
-            ReferencedContainer = "container:MindMapAI.xcodeproj">
+            ReferencedContainer = "container:NoteMap AI.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

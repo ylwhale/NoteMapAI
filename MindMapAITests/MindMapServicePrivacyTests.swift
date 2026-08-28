@@ -5,7 +5,7 @@ import Testing
 
 @MainActor
 struct MindMapServicePrivacyTests {
-    @Test("OpenAI request sends only the question and selected excerpts with storage disabled")
+    @Test("OpenAI request sends selected excerpts with labeled context and storage disabled")
     func openAIRequestIsPrivacyBoundedAndStructured() async throws {
         let endpoint = uniqueEndpoint("privacy")
         let recorder = CapturedRequestBox()
@@ -21,8 +21,9 @@ struct MindMapServicePrivacyTests {
             body: "The last train leaves at 10:40 PM.",
             createdAt: Date(timeIntervalSince1970: 1_700_000_000),
             updatedAt: Date(timeIntervalSince1970: 1_700_000_000),
+            eventDate: Date(timeIntervalSince1970: 1_700_086_800),
             place: place,
-            acceptedTags: ["travel"]
+            acceptedTags: ["travel", "train"]
         )
         let unrelatedPrivateText = "UNRELATED_PRIVATE_MEDICAL_NOTE_take_medication_at_7"
         let unrelatedNote = MindNote(body: unrelatedPrivateText, acceptedTags: ["health"])
@@ -76,14 +77,21 @@ struct MindMapServicePrivacyTests {
         #expect(request.value(forHTTPHeaderField: "Content-Type") == "application/json")
         #expect(requestJSON["store"] as? Bool == false)
         #expect(requestJSON["model"] as? String == "gpt-test")
+        let requestInstructions = requestJSON["instructions"] as? String ?? ""
+        #expect(requestInstructions.contains("upcoming or completed"))
+        #expect(requestInstructions.contains("Do not return a question"))
 
         let input = requestJSON["input"] as? String ?? ""
         #expect(input.contains(question))
         #expect(input.contains("The last train leaves at 10:40 PM."))
         #expect(input.contains(relevantNote.id.uuidString))
+        #expect(input.contains("reference_at:"))
+        #expect(input.contains("captured_at:"))
+        #expect(input.contains("event_at:"))
+        #expect(input.contains("matched_tags: train"))
+        #expect(input.contains("place: Private dorm room — Exact room and floor must stay local"))
+        #expect(input.contains("evidence_excerpt:"))
         #expect(!input.contains(unrelatedPrivateText))
-        #expect(!input.contains(place.name))
-        #expect(!input.contains(place.detail))
         #expect(!input.contains("41.878123"))
         #expect(!input.contains("41.8781"))
         #expect(!input.contains("-87.629456"))
@@ -186,6 +194,49 @@ struct MindMapServicePrivacyTests {
             [first, second, third],
             selectedSourceIDs: []
         ).isEmpty)
+    }
+
+    @Test("Grounding failures preserve readable text for opt-in display")
+    func groundingFailurePreservesUnverifiedResponse() async throws {
+        let endpoint = uniqueEndpoint("unverified")
+        let source = makeSource()
+        let responseData = try successfulProviderEnvelope(
+            answer: "The last train leaves at 10:45 PM.",
+            sourceID: source.noteID,
+            quote: source.excerpt
+        )
+        MockResponsesURLProtocol.register(endpoint) { _ in
+            (
+                HTTPURLResponse(
+                    url: endpoint,
+                    statusCode: 200,
+                    httpVersion: "HTTP/1.1",
+                    headerFields: ["Content-Type": "application/json"]
+                )!,
+                responseData
+            )
+        }
+        defer { MockResponsesURLProtocol.unregister(endpoint) }
+
+        let service = OpenAIConclusionService(
+            endpoint: endpoint,
+            session: mockSession()
+        )
+        do {
+            _ = try await service.generateConclusion(
+                question: "When does the train leave?",
+                sources: [source],
+                apiKey: "sk-test",
+                model: "gpt-test"
+            )
+            Issue.record("An ungrounded provider response should remain blocked by default.")
+        } catch let error as AIProviderError {
+            guard case let .unverifiedResponse(response) = error else {
+                Issue.record("Expected a readable unverified response, got \(error).")
+                return
+            }
+            #expect(response == "The last train leaves at 10:45 PM.")
+        }
     }
 
     @Test("Provider rejection and URL timeout map to explicit provider errors")

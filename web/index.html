@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="NoteMap AI — a browser companion for capturing notes, finding evidence, and turning ideas into plans." />
+    <meta name="theme-color" content="#f6f5f0" />
+    <title>NoteMap AI — Web Companion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#home" data-tab="home" aria-label="NoteMap AI home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span>NoteMap <em>AI</em></span>
+        </a>
+        <div class="topbar-meta"><span class="status-dot" aria-hidden="true"></span><span>Browser companion</span></div>
+      </header>
+
+      <main class="app-main">
+        <section id="app-view" aria-live="polite"></section>
+      </main>
+
+      <footer class="footer">
+        <div class="footer-brand"><span class="status-dot" aria-hidden="true"></span> NoteMap AI</div>
+        <p>Separate web companion · Your data stays in this browser</p>
+      </footer>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <input id="import-file" class="visually-hidden" type="file" accept="application/json,.json" />
+    <script src="app.js"></script>
+  </body>
+</html>

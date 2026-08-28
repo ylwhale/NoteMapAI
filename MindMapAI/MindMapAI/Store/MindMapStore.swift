@@ -100,7 +100,17 @@ final class MindMapStore: ObservableObject {
         tagSuggestions = loaded.archive.tagSuggestions
         plans = loaded.archive.plans.sorted { $0.updatedAt > $1.updatedAt }
         queryHistory = loaded.archive.queryHistory.sorted { $0.createdAt > $1.createdAt }
-        preferences = loadedPreferences.preferences
+        var initialPreferences = loadedPreferences.preferences
+        // UI tests run against a persistent simulator container. Reset only the Ask draft
+        // between test launches so one test's question cannot become another test's input.
+        // This argument is never supplied during a normal app launch.
+        if ProcessInfo.processInfo.arguments.contains("-MindMapAIUITestResetAskDraft") {
+            initialPreferences.askDraft = .init()
+        }
+        preferences = initialPreferences
+        if ProcessInfo.processInfo.arguments.contains("-MindMapAIUITestResetAskDraft") {
+            try? persistPreferences(preferences)
+        }
         persistenceMessage = Self.joinedMessages(loaded.message, loadedPreferences.message)
     }
 

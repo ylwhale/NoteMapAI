@@ -276,7 +276,7 @@ private nonisolated extension JSONDecoder {
 struct CaptureMindMapNoteIntent: AppIntent {
     static let title: LocalizedStringResource = "Capture a MindMap Note"
     static let description = IntentDescription(
-        "Save text to your private MindMap AI library from Siri or Shortcuts."
+        "Save text to your private MindMap AI library using Shortcuts."
     )
 
     @Parameter(title: "Note")
